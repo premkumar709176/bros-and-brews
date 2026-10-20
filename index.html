@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111111">
+  <title>Bros & Brews | Good Food. Great Vibes.</title>
+
+  <style>
+    :root {
+      --black: #111111;
+      --dark: #191919;
+      --yellow: #ffd429;
+      --white: #ffffff;
+      --muted: #b5b5b5;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      cursor: pointer;
+      font: inherit;
+    }
+
+    header {
+      background: rgba(17, 17, 17, 0.97);
+      border-bottom: 1px solid #303030;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    nav {
+      max-width: 1150px;
+      margin: auto;
+      padding: 17px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .logo {
+      font-size: 21px;
+      font-weight: 900;
+      letter-spacing: -1px;
+    }
+
+    .logo span {
+      color: var(--yellow);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 23px;
+      font-size: 14px;
+    }
+
+    .nav-links a:hover {
+      color: var(--yellow);
+    }
+
+    .hero {
+      max-width: 1150px;
+      margin: auto;
+      padding: 85px 22px 75px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      align-items: center;
+      gap: 45px;
+    }
+
+    .eyebrow {
+      color: var(--yellow);
+      text-transform: uppercase;
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 3px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: clamp(43px, 7vw, 76px);
+      line-height: 1.04;
+      letter-spacing: -3px;
+      margin-bottom: 22px;
+    }
+
+    h1 span {
+      color: var(--yellow);
+    }
+
+    .hero p {
+      color: var(--muted);
+      max-width: 450px;
+      margin-bottom: 28px;
+    }
+
+    .button {
+      display: inline-block;
+      background: var(--yellow);
+      color: #111;
+      border: 0;
+      border-radius: 6px;
+      padding: 12px 21px;
+      font-weight: 800;
+      margin: 5px 7px 5px 0;
+    }
+
+    .button:hover {
+      background: #ffe575;
+    }
+
+    .button-outline {
+      border: 1px solid #666;
+      border-radius: 6px;
+      padding: 11px 19px;
+      display: inline-block;
+    }
+
+    .hero-image {
+      min-height: 330px;
+      border-radius: 18px;
+      background:
+        linear-gradient(0deg, rgba(0,0,0,.3), rgba(0,0,0,.05)),
+        url("https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=1000&q=85")
+        center / cover;
+      border: 1px solid #333;
+      display: flex;
+      align-items: end;
+      padding: 22px;
+    }
+
+    .image-label {
+      background: var(--yellow);
+      color: #111;
+      padding: 9px 14px;
+      border-radius: 5px;
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    section {
+      padding: 65px 22px;
+      scroll-margin-top: 75px;
+    }
+
+    .section-inner {
+      max-width: 1150px;
+      margin: auto;
+    }
+
+    .section-heading {
+      margin-bottom: 28px;
+    }
+
+    .section-heading h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .section-heading p {
+      color: var(--muted);
+    }
+
+    .yellow {
+      color: var(--yellow);
+    }
+
+    .about {
+      background: var(--dark);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .about-copy p {
+      color: var(--muted);
+      margin: 14px 0;
+    }
+
+    .feature-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 13px;
+    }
+
+    .feature {
+      background: #242424;
+      border: 1px solid #333;
+      border-radius: 9px;
+      padding: 20px;
+    }
+
+    .feature strong {
+      display: block;
+      color: var(--yellow);
+      margin-bottom: 5px;
+    }
+
+    .feature span {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .filters {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-bottom: 25px;
+    }
+
+    .filter {
+      border: 1px solid #414141;
+      background: transparent;
+      color: white;
+      padding: 9px 15px;
+      border-radius: 25px;
+    }
+
+    .filter.active,
+    .filter:hover {
+      background: var(--yellow);
+      border-color: var(--yellow);
+      color: #111;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .food-card {
+      background: var(--dark);
+      border: 1px solid #303030;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform .2s, border-color .2s;
+    }
+
+    .food-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--yellow);
+    }
+
+    .food-image {
+      height: 185px;
+      background: #252525;
+      overflow: hidden;
+    }
+
+    .food-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .food-info {
+      padding: 18px;
+    }
+
+    .food-info h3 {
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+
+    .food-info p {
+      color: var(--muted);
+      font-size: 13px;
+      min-height: 42px;
+      margin-bottom: 12px;
+    }
+
+    .food-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .price {
+      color: var(--yellow);
+      font-weight: 900;
+      font-size: 20px;
+    }
+
+    .details {
+      font-size: 12px;
+      color: var(--yellow);
+    }
+
+    .calorie-note {
+      color: #999;
+      font-size: 11px;
+      margin-top: 8px;
+    }
+
+    .reviews {
+      background: var(--dark);
+    }
+
+    .review-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    .review-form,
+    .review-card {
+      background: #222;
+      border: 1px solid #383838;
+      padding: 23px;
+      border-radius: 12px;
+    }
+
+    .review-form h3,
+    .review-card h3 {
+      margin-bottom: 15px;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px;
+      margin: 7px 0 12px;
+      background: #151515;
+      border: 1px solid #444;
+      color: white;
+      border-radius: 6px;
+      font: inherit;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .stars {
+      color: var(--yellow);
+      letter-spacing: 3px;
+    }
+
+    .review-card p {
+      color: var(--muted);
+      margin: 10px 0;
+    }
+
+    .review-card small {
+      color: #999;
+    }
+
+    .notice {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 12px;
+    }
+
+    .location-placeholder {
+      background: #202020;
+      border: 1px dashed #555;
+      padding: 35px 20px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .location-placeholder p {
+      color: var(--muted);
+      margin: 8px 0 15px;
+    }
+
+    footer {
+      border-top: 1px solid #333;
+      padding: 30px 22px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    footer strong {
+      color: var(--yellow);
+    }
+
+    @media (max-width: 760px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 55px;
+        gap: 28px;
+      }
+
+      .hero-image {
+        min-height: 260px;
+      }
+
+      .about-grid,
+      .review-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .menu-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .food-image {
+        height: 140px;
+      }
+
+      .food-info {
+        padding: 12px;
+      }
+
+      .food-info h3 {
+        font-size: 15px;
+      }
+
+      .food-info p {
+        font-size: 12px;
+      }
+
+      .price {
+        font-size: 17px;
+      }
+
+      nav {
+        flex-wrap: wrap;
+      }
+
+      .nav-links {
+        gap: 15px;
+        font-size: 12px;
+        flex-wrap: wrap;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .menu-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .food-image {
+        height: 210px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <nav>
+    <a href="#" class="logo">BROS <span>&</span> BREWS.</a>
+
+    <div class="nav-links">
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#menu">Menu</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#location">Location</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+  <section class="hero" id="home">
+    <div>
+      <div class="eyebrow">Your new favourite food stop</div>
+
+      <h1>GOOD FOOD.<br><span>GREAT VIBES.</span></h1>
+
+      <p>
+        Crispy bites, chilled coffee and delicious combos.
+        Discover your next favourite craving at Bros & Brews.
+      </p>
+
+      <a href="#menu" class="button">EXPLORE MENU ↗</a>
+      <a href="#location" class="button-outline">FIND OUR CART</a>
+    </div>
+
+    <div class="hero-image">
+      <span class="image-label">MADE FOR YOUR CRAVINGS</span>
+    </div>
+  </section>
+
+  <section class="about" id="about">
+    <div class="section-inner about-grid">
+
+      <div class="about-copy">
+        <div class="eyebrow">The story behind the flavour</div>
+        <div class="section-heading">
+          <h2>MORE THAN A <span class="yellow">FOOD CART.</span></h2>
+        </div>
+
+        <p>
+          Welcome to Bros & Brews, your spot for satisfying snacks,
+          refreshing cold coffee and delicious combinations.
+        </p>
+
+        <p>
+          From crispy fries to cheesy corn and indulgent coffee
+          flavours, discover something for every craving.
+        </p>
+
+        <p>
+          Good food. Great vibes. That's the Bros & Brews way.
+        </p>
+
+        <a href="#menu" class="button">DISCOVER OUR MENU</a>
+      </div>
+
+      <div class="feature-list">
+        <div class="feature">
+          <strong>☕ Coffee</strong>
+          <span>Explore our coffee flavours.</span>
+        </div>
+
+        <div class="feature">
+          <strong>🍟 Crispy Bites</strong>
+          <span>Find your favourite snacks.</span>
+        </div>
+
+        <div class="feature">
+          <strong>🌽 Delicious Snacks</strong>
+          <span>Something for every craving.</span>
+        </div>
+
+        <div class="feature">
+          <strong>🎁 Combos</strong>
+          <span>Discover tasty combinations.</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="menu">
+    <div class="section-inner">
+
+      <div class="section-heading">
+        <div class="eyebrow">Made for your cravings</div>
+        <h2>EXPLORE THE <span class="yellow">MENU.</span></h2>
+        <p>Discover our drinks, snacks and signature combinations.</p>
+      </div>
+
+      <div class="filters">
+        <button class="filter active" data-category="All">All Items</button>
+        <button class="filter" data-category="Coffee">Cold Coffee</button>
+        <button class="filter" data-category="Fries">French Fries</button>
+        <button class="filter" data-category="Corn">Corn</button>
+        <button class="filter" data-category="Potato">Spiral Potato</button>
+        <button class="filter" data-category="Combos">Combos</button>
+      </div>
+
+      <div class="menu-grid" id="menuGrid"></div>
+
+      <p class="notice">
+        Prices and nutritional information should be confirmed against
+        the current menu before publication. Calorie values will be
+        added after verification.
+      </p>
+
+    </div>
+  </section>
+
+  <section class="reviews" id="reviews">
+    <div class="section-inner">
+
+      <div class="section-heading">
+        <div class="eyebrow">Your experience matters</div>
+        <h2>LOVE THE FOOD? <span class="yellow">TELL US.</span></h2>
+        <p>We'd love to hear about your Bros & Brews experience.</p>
+      </div>
+
+      <div class="review-grid">
+
+        <form class="review-form" id="reviewForm">
+          <h3>Write a Review</h3>
+
+          <label for="reviewName">Your name</label>
+          <input id="reviewName" maxlength="60" required
+                 placeholder="Enter your name">
+
+          <label for="reviewRating">Your rating</label>
+          <select id="reviewRating" required>
+            <option value="5">★★★★★ — Excellent</option>
+            <option value="4">★★★★☆ — Very good</option>
+            <option value="3">★★★☆☆ — Good</option>
+            <option value="2">★★☆☆☆ — Fair</option>
+            <option value="1">★☆☆☆☆ — Poor</option>
+          </select>
+
+          <label for="reviewText">Your review</label>
+          <textarea id="reviewText" maxlength="1000" required
+                    placeholder="Tell us what you think..."></textarea>
+
+          <button type="submit" class="button">SUBMIT REVIEW</button>
+
+          <p class="notice" id="reviewMessage" aria-live="polite">
+            Reviews on this demo are saved only in this browser.
+            Database storage and admin approval will be connected next.
+          </p>
+        </form>
+
+        <div>
+          <h3 style="margin-bottom:15px">Customer Love</h3>
+          <div id="reviewList">
+            <div class="review-card">
+              <p>Be the first to share your experience!</p>
+              <small>We look forward to hearing from you.</small>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="location">
+    <div class="section-inner">
+
+      <div class="section-heading">
+        <div class="eyebrow">Come say hello</div>
+        <h2>FIND <span class="yellow">OUR CART.</span></h2>
+        <p>We will add the location and directions here.</p>
+      </div>
+
+      <div class="location-placeholder">
+        <h3>📍 Our Location</h3>
+        <p>
+          Our exact location, Google Maps directions and opening hours
+          will be added when you are ready.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p class="logo">BROS <span>&</span> BREWS.</p>
+  <p>Good Food. Great Vibes.</p>
+  <p style="margin-top:12px">
+    © <span id="year"></span> Bros & Brews. All rights reserved.
+  </p>
+</footer>
+
+<script>
+  const products = [
+    {
+      name: "Classic Cold Coffee",
+      category: "Coffee",
+      price: 49,
+      description: "A classic chilled coffee favourite.",
+      image: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=700&q=80"
+    },
+    {
+      name: "Oreo Cold Coffee",
+      category: "Coffee",
+      price: 79,
+      description: "A creamy coffee-inspired treat.",
+      image: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=700&q=80"
+    },
+    {
+      name: "Hazelnut Cold Coffee",
+      category: "Coffee",
+      price: 99,
+      description: "A delicious hazelnut coffee option.",
+      image: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=700&q=80"
+    },
+    {
+      name: "Small French Fries",
+      category: "Fries",
+      price: 39,
+      description: "A snack-sized portion of fries.",
+      image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=700&q=80"
+    },
+    {
+      name: "Big French Fries",
+      category: "Fries",
+      price: 59,
+      description: "A bigger portion for bigger cravings.",
+      image: "https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?auto=format&fit=crop&w=700&q=80"
+    },
+    {
+      name: "Butter Corn",
+      category: "Corn",
+      price: 39,
+      description: "Sweet corn with a buttery touch.",
+      image: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=700&q=80"
+    },
+    {
+      name: "Masala Corn",
+      category: "Corn",
+      price: 49,
+      description: "Corn with a masala-inspired flavour.",
+      image: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=700&q=80"
+    },
+    {
+      name: "Cheese Chilli Corn",
+      category: "Corn",
+      price: 59,
+      description: "A cheesy corn snack with chilli flavour.",
+      image: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=700&q=80"
+    },
+    {
+      name: "Classic Spiral Potato",
+      category: "Potato",
+      price: 59,
+      description: "A spiral-shaped potato snack.",
+      image: "https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?auto=format&fit=crop&w=700&q=80"
+    },
+    {
+      name: "Peri Peri Spiral Potato",
+      category: "Potato",
+      price: 69,
+      description: "Spiral potato with peri peri seasoning.",
+      image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=700&q=80"
+    },
+    {
+      name: "Coffee Combo",
+      category: "Combos",
+      price: 79,
+      description: "A coffee combo. Contents to be confirmed.",
+      image: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=700&q=80"
+    },
+    {
+      name: "Bro's Special Combo",
+      category: "Combos",
+      price: 139,
+      description: "Our special combination. Contents to be confirmed.",
+      image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=700&q=80"
+    },
+    {
+      name: "Friends Combo",
+      category: "Combos",
+      price: 199,
+      description: "A combo to share. Contents to be confirmed.",
+      image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=700&q=80"
+    }
+  ];
+
+  const menuGrid = document.getElementById("menuGrid");
+
+  function renderMenu(category = "All") {
+    const filtered = category === "All"
+      ? products
+      : products.filter(product => product.category === category);
+
+    menuGrid.innerHTML = filtered.map((product, index) => `
+      <article class="food-card">
+        <div class="food-image">
+          <img
+            src="${product.image}"
+            alt="${product.name}"
+            loading="lazy"
+          >
+        </div>
+
+        <div class="food-info">
+          <h3>${product.name}</h3>
+          <p>${product.description}</p>
+
+          <div class="food-bottom">
+            <span class="price">₹${product.price}</span>
+            <span class="details">MENU ITEM</span>
+          </div>
+
+          <div class="calorie-note">
+            Calories: Not yet verified
+          </div>
+        </div>
+      </article>
+    `).join("");
+  }
+
+  document.querySelectorAll(".filter").forEach(button => {
+    button.addEventListener("click", () => {
+      document.querySelectorAll(".filter").forEach(item => {
+        item.classList.remove("active");
+      });
+
+      button.classList.add("active");
+      renderMenu(button.dataset.category);
+    });
+  });
+
+  const reviewForm = document.getElementById("reviewForm");
+  const reviewList = document.getElementById("reviewList");
+  const reviewMessage = document.getElementById("reviewMessage");
+
+  function getLocalReviews() {
+    try {
+      return JSON.parse(
+        localStorage.getItem("brosBrewsDemoReviews") || "[]"
+      );
+    } catch {
+      return [];
+    }
+  }
+
+  function renderReviews() {
+    const reviews = getLocalReviews();
+
+    if (!reviews.length) {
+      reviewList.innerHTML = `
+        <div class="review-card">
+          <p>Be the first to share your experience!</p>
+          <small>We look forward to hearing from you.</small>
+        </div>
+      `;
+      return;
+    }
+
+    reviewList.innerHTML = reviews.map(review => `
+      <article class="review-card">
+        <div class="stars">${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}</div>
+        <h3>${escapeHTML(review.name)}</h3>
+        <p>${escapeHTML(review.text)}</p>
+        <small>Demo review · Stored on this device only</small>
+      </article>
+    `).join("");
+  }
+
+  function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, character => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[character]);
+  }
+
+  reviewForm.addEventListener("submit", event => {
+    event.preventDefault();
+
+    const name = document.getElementById("reviewName").value.trim();
+    const rating = Number(document.getElementById("reviewRating").value);
+    const text = document.getElementById("reviewText").value.trim();
+
+    if (!name || !text || rating < 1 || rating > 5) {
+      reviewMessage.textContent = "Please complete all review fields.";
+      return;
+    }
+
+    const reviews = getLocalReviews();
+
+    reviews.unshift({
+      name,
+      rating,
+      text,
+      date: new Date().toISOString()
+    });
+
+    try {
+      localStorage.setItem(
+        "brosBrewsDemoReviews",
+        JSON.stringify(reviews.slice(0, 20))
+      );
+
+      reviewForm.reset();
+      reviewMessage.textContent =
+        "Demo review saved on this device. Public review approval will be connected later.";
+
+      renderReviews();
+    } catch {
+      reviewMessage.textContent =
+        "Could not save the review in this browser.";
+    }
+  });
+
+  document.getElementById("year").textContent =
+    new Date().getFullYear();
+
+  renderMenu();
+  renderReviews();
+</script>
+
+</body>
+</html>
