@@ -1,186 +1,388 @@
-// ============================================
-// FOODCART - MAIN JAVASCRIPT
-// ============================================
+// =============================================
+// BROS & BREWS — SUPABASE CONNECTION
+// =============================================
 
-const FOOD_ITEMS = [
-    {
-        id: 1,
-        name: "Classic Burger",
-        category: "Burgers",
-        price: 99,
-        emoji: "🍔",
-        description: "Juicy burger with fresh vegetables"
-    },
-    {
-        id: 2,
-        name: "Cheese Pizza",
-        category: "Pizza",
-        price: 179,
-        emoji: "🍕",
-        description: "Cheesy pizza with delicious toppings"
-    },
-    {
-        id: 3,
-        name: "French Fries",
-        category: "Snacks",
-        price: 69,
-        emoji: "🍟",
-        description: "Crispy golden potato fries"
-    },
-    {
-        id: 4,
-        name: "Cold Coffee",
-        category: "Drinks",
-        price: 89,
-        emoji: "🥤",
-        description: "Chilled and creamy cold coffee"
-    },
-    {
-        id: 5,
-        name: "Chicken Burger",
-        category: "Burgers",
-        price: 149,
-        emoji: "🍔",
-        description: "Delicious burger with a chicken patty"
-    },
-    {
-        id: 6,
-        name: "Chocolate Shake",
-        category: "Drinks",
-        price: 109,
-        emoji: "🍫",
-        description: "Rich chocolate milkshake"
-    }
-];
+const SUPABASE_URL = "https://suscodhmbpctrwidoefo.supabase.co/rest/v1/";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_d-UuMIgT3i-nZG1PfgqkBQ_rWQRVBfu";
 
-let cart = [];
-let activeCategory = "All";
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+);
 
-// Render food menu
-function renderFoodItems() {
+let allMenuItems = [];
+let activeCategory = "all";
+
+// ---------------------------------------------
+// LOAD MENU FROM SUPABASE
+// ---------------------------------------------
+
+async function loadMenu() {
     const container = document.getElementById("food-list");
 
-    if (!container) {
-        console.warn("Add an element with id='food-list' to index.html.");
+    try {
+        const { data, error } = await supabaseClient
+            .from("menu_items")
+            .select("*, categories(name)")
+            .eq("is_available", true)
+            .order("name");
+
+        if (error) throw error;
+
+        allMenuItems = data || [];
+
+        renderCategoryFilters();
+        renderMenu();
+
+    } catch (error) {
+        console.error("Menu loading error:", error);
+
+        container.innerHTML =
+            '<p class="muted">Unable to load the menu. ' +
+            'Please try again later.</p>';
+    }
+}
+
+// ---------------------------------------------
+// LOAD CATEGORIES
+// ---------------------------------------------
+
+async function loadCategories() {
+    try {
+        const { data, error } = await supabaseClient
+            .from("categories")
+            .select("id, name")
+            .order("name");
+
+        if (error) throw error;
+
+        return data || [];
+
+    } catch (error) {
+        console.error("Category loading error:", error);
+        return [];
+    }
+}
+
+// ---------------------------------------------
+// CATEGORY FILTER BUTTONS
+// ---------------------------------------------
+
+async function renderCategoryFilters() {
+    const container = document.getElementById("category-filters");
+    const categories = await loadCategories();
+
+    const buttons = [
+        { id: "all", name: "All Items" },
+        ...categories.map(category => ({
+            id: String(category.id),
+            name: category.name
+        }))
+    ];
+
+    container.innerHTML = buttons.map(category => `
+        <button
+            type="button"
+            class="filter-button ${
+                String(activeCategory) === category.id ? "active" : ""
+            }"
+            data-category="${category.id}">
+            ${escapeHTML(category.name)}
+        </button>
+    `).join("");
+
+    container.querySelectorAll("button").forEach(button => {
+        button.addEventListener("click", () => {
+            activeCategory = button.dataset.category;
+
+            container.querySelectorAll("button").forEach(item => {
+                item.classList.toggle(
+                    "active",
+                    item.dataset.category === activeCategory
+                );
+            });
+
+            renderMenu();
+        });
+    });
+}
+
+// ---------------------------------------------
+// DISPLAY MENU ITEMS
+// ---------------------------------------------
+
+function renderMenu() {
+    const container = document.getElementById("food-list");
+
+    const filteredItems = allMenuItems.filter(item => {
+        if (activeCategory === "all") return true;
+
+        return String(item.category_id) === activeCategory;
+    });
+
+    if (filteredItems.length === 0) {
+        container.innerHTML =
+            '<p class="muted">Our menu is being prepared. ' +
+            'Check back soon!</p>';
         return;
     }
 
-    const filteredItems = activeCategory === "All"
-        ? FOOD_ITEMS
-        : FOOD_ITEMS.filter(item => item.category === activeCategory);
+    container.innerHTML = filteredItems.map(item => {
+        const photo = item.photo_url
+            ? `<img src="${escapeHTML(item.photo_url)}"
+                    alt="${escapeHTML(item.name)}"
+                    loading="lazy"
+                    onerror="this.parentElement.textContent='🍽️'">`
+            : "🍽️";
 
-    container.innerHTML = filteredItems.map(item => `
-        <article class="food-card">
-            <div class="food-emoji">${item.emoji}</div>
-            <h3>${item.name}</h3>
-            <p>${item.description}</p>
-            <div class="food-card-bottom">
-                <strong>₹${item.price}</strong>
-                <button type="button" onclick="addToCart(${item.id})">
-                    Add +
-                </button>
-            </div>
-        </article>
-    `).join("");
+        const category = item.categories?.name || "Our Menu";
+
+        return `
+            <article class="food-card">
+                <div class="food-photo">${photo}</div>
+
+                <div class="food-content">
+                    <h3>${escapeHTML(item.name)}</h3>
+
+                    <p>${escapeHTML(item.description || "")}</p>
+
+                    <div class="food-meta">
+                        <span>${escapeHTML(category)}</span>
+                        <span>
+                            ${
+                                item.calories !== null
+                                    ? `${item.calories} kcal`
+                                    : "Calories not listed"
+                            }
+                        </span>
+                    </div>
+
+                    <div class="food-bottom">
+                        <span class="price">
+                            ₹${Number(item.price).toFixed(2)}
+                        </span>
+
+                        ${
+                            item.is_available
+                                ? '<span class="status">Available</span>'
+                                : '<span class="status sold-out">Sold Out</span>'
+                        }
+                    </div>
+                </div>
+            </article>
+        `;
+    }).join("");
 }
 
-// Filter food by category
-function filterCategory(category) {
-    activeCategory = category;
-    renderFoodItems();
-}
+// ---------------------------------------------
+// LOAD APPROVED REVIEWS ONLY
+// ---------------------------------------------
 
-// Add food to cart
-function addToCart(id) {
-    const item = FOOD_ITEMS.find(food => food.id === id);
+async function loadReviews() {
+    const container = document.getElementById("review-list");
 
-    if (!item) return;
+    try {
+        const { data, error } = await supabaseClient
+            .from("reviews")
+            .select("customer_name, rating, comment, created_at")
+            .eq("is_approved", true)
+            .order("created_at", { ascending: false })
+            .limit(12);
 
-    const existingItem = cart.find(food => food.id === id);
+        if (error) throw error;
 
-    if (existingItem) {
-        existingItem.quantity += 1;
-    } else {
-        cart.push({ ...item, quantity: 1 });
+        if (!data || data.length === 0) {
+            container.innerHTML =
+                '<p class="muted">Be one of the first to share ' +
+                'your experience!</p>';
+            return;
+        }
+
+        container.innerHTML = data.map(review => `
+            <article class="review-card">
+                <div class="stars">
+                    ${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}
+                </div>
+
+                <h3>${escapeHTML(review.customer_name)}</h3>
+
+                <p>${escapeHTML(review.comment)}</p>
+            </article>
+        `).join("");
+
+    } catch (error) {
+        console.error("Review loading error:", error);
+
+        container.innerHTML =
+            '<p class="muted">Reviews are temporarily unavailable.</p>';
     }
-
-    renderCart();
-
-    console.log(`${item.name} added to cart.`);
 }
 
-// Change item quantity
-function changeQuantity(id, change) {
-    const item = cart.find(food => food.id === id);
+// ---------------------------------------------
+// SUBMIT A REVIEW FOR ADMIN APPROVAL
+// ---------------------------------------------
 
-    if (!item) return;
+async function submitReview(event) {
+    event.preventDefault();
 
-    item.quantity += change;
+    const form = document.getElementById("review-form");
+    const button = document.getElementById("review-submit");
+    const message = document.getElementById("review-message");
 
-    if (item.quantity <= 0) {
-        cart = cart.filter(food => food.id !== id);
-    }
+    const customerName = document
+        .getElementById("customer-name").value.trim();
 
-    renderCart();
-}
-
-// Calculate cart total
-function getCartTotal() {
-    return cart.reduce(
-        (total, item) => total + item.price * item.quantity,
-        0
+    const rating = Number(
+        document.getElementById("rating").value
     );
-}
 
-// Render shopping cart
-function renderCart() {
-    const container = document.getElementById("cart-items");
-    const totalElement = document.getElementById("cart-total");
-    const countElement = document.getElementById("cart-count");
+    const comment = document
+        .getElementById("review-comment").value.trim();
 
-    const count = cart.reduce(
-        (total, item) => total + item.quantity,
-        0
-    );
-
-    if (countElement) {
-        countElement.textContent = count;
-    }
-
-    if (totalElement) {
-        totalElement.textContent = `₹${getCartTotal()}`;
-    }
-
-    if (!container) return;
-
-    if (cart.length === 0) {
-        container.innerHTML = "<p>Your cart is empty 🛒</p>";
+    if (
+        customerName.length < 1 ||
+        customerName.length > 80 ||
+        !Number.isInteger(rating) ||
+        rating < 1 ||
+        rating > 5 ||
+        comment.length < 1 ||
+        comment.length > 1000
+    ) {
+        message.textContent = "Please check your review details.";
         return;
     }
 
-    container.innerHTML = cart.map(item => `
-        <div class="cart-item">
-            <div>
-                <strong>${item.emoji} ${item.name}</strong>
-                <p>₹${item.price} × ${item.quantity}</p>
-            </div>
+    button.disabled = true;
+    button.textContent = "Submitting...";
 
-            <div class="quantity-controls">
-                <button type="button"
-                    onclick="changeQuantity(${item.id}, -1)">−</button>
+    try {
+        const { error } = await supabaseClient
+            .from("reviews")
+            .insert({
+                customer_name: customerName,
+                rating: rating,
+                comment: comment,
+                is_approved: false
+            });
 
-                <span>${item.quantity}</span>
+        if (error) throw error;
 
-                <button type="button"
-                    onclick="changeQuantity(${item.id}, 1)">+</button>
-            </div>
-        </div>
-    `).join("");
+        message.textContent =
+            "Thank you! Your review was submitted for approval.";
+
+        form.reset();
+
+    } catch (error) {
+        console.error("Review submission error:", error);
+
+        message.textContent =
+            "We couldn't submit your review. Please try again.";
+    } finally {
+        button.disabled = false;
+        button.textContent = "Submit Review";
+    }
 }
 
-// Start the website
-document.addEventListener("DOMContentLoaded", () => {
-    renderFoodItems();
-    renderCart();
-    console.log("FoodCart is ready!");
+// ---------------------------------------------
+// LOAD BUSINESS DETAILS
+// ---------------------------------------------
+
+async function loadBusinessDetails() {
+    try {
+        const { data, error } = await supabaseClient
+            .from("business_details")
+            .select("*")
+            .limit(1)
+            .maybeSingle();
+
+        if (error) throw error;
+
+        if (!data) return;
+
+        document.getElementById("contact-name").textContent =
+            data.business_name || "Bros & Brews";
+
+        document.getElementById("business-description").textContent =
+            data.description ||
+            "Good food and great company at Bros & Brews.";
+
+        document.getElementById("business-address").textContent =
+            data.address || "Location details coming soon.";
+
+        const phone = document.getElementById("business-phone");
+        phone.textContent = data.phone || "Contact number coming soon.";
+
+        if (data.phone) {
+            const link = document.createElement("a");
+            link.href = "tel:" + data.phone.replace(/[^\d+]/g, "");
+            link.textContent = data.phone;
+            phone.replaceChildren(link);
+        }
+
+        const hours = document.getElementById("opening-hours");
+        const openingHours = data.opening_hours || {};
+
+        const entries = Object.entries(openingHours);
+
+        hours.textContent = entries.length
+            ? entries.map(([day, time]) => `${day}: ${time}`).join(" | ")
+            : "Opening hours coming soon.";
+
+        const mapLink = document.getElementById("map-link");
+
+        if (data.map_url) {
+            try {
+                const parsedURL = new URL(data.map_url);
+
+                if (
+                    parsedURL.protocol === "https:" ||
+                    parsedURL.protocol === "http:"
+                ) {
+                    mapLink.href = parsedURL.href;
+                    mapLink.hidden = false;
+                }
+            } catch {
+                console.warn("Invalid map URL in business details.");
+            }
+        }
+
+    } catch (error) {
+        console.error("Business details loading error:", error);
+    }
+}
+
+// ---------------------------------------------
+// BASIC HTML ESCAPING
+// ---------------------------------------------
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[character]);
+}
+
+// ---------------------------------------------
+// START WEBSITE
+// ---------------------------------------------
+
+document.addEventListener("DOMContentLoaded", async () => {
+    document.getElementById("current-year").textContent =
+        new Date().getFullYear();
+
+    document.getElementById("review-form").addEventListener(
+        "submit",
+        submitReview
+    );
+
+    await Promise.all([
+        loadMenu(),
+        loadReviews(),
+        loadBusinessDetails()
+    ]);
+
+    console.log("Bros & Brews website initialized.");
 });
